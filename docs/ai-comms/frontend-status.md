@@ -1,9 +1,9 @@
 # Status Frontend (ditulis hanya oleh FRONTEND AI — OpenCode)
 
 ## Ringkasan Saat Ini
-- Tugas aktif: FE-003 — Komponen: navbar, bottom-nav mobile, footer, product card, pagination, format Rupiah
-- Terakhir selesai: FE-002 — API client + mock API (CSRF, envelope, error handling) — status `REVIEW`
-- Langkah berikutnya: FE-003
+- Tugas aktif: FE-004 — Halaman login & register + route guard (`guard.js`)
+- Terakhir selesai: FE-003 — Komponen UI reusable (navbar, bottom-nav, footer, product card, pagination, toast, modal) + `format.js` (Rupiah & tanggal Indonesia) — status `REVIEW`
+- Langkah berikutnya: FE-004
 
 ## Pertanyaan Terbuka
 (kosong)
@@ -23,4 +23,11 @@
 - Cara uji: modul api dengan `USE_MOCK=true` — endpoint `/config/public`, `/auth/csrf`, `/auth/me`, `/products`, `/products/{id}`, `/auth/login`, `/auth/register`.
 - Penyimpangan dari kontrak: tidak ada.
 - Pertanyaan/Keputusan dibutuhkan: pemilihan named export `IKURIN_CONFIG` + assignment `window.IKURIN_CONFIG` di `config.js` (disetujui).
+
+### 2026-10-29 18:57 — FE-003 — REVIEW
+- Ringkasan: Komponen reusable UI (navbar, bottom-nav, footer, product card, pagination, toast, modal) + `format.js` (Rupiah & tanggal Indonesia Intl) selesai.
+- File diubah: `htdocs/assets/js/components/*.js`, `htdocs/assets/js/format.js` (baru).
+- Cara uji: butuh halaman HTML pembungkus komponen; cek via halaman setelah FE-007.
+- Penyimpangan dari kontrak: tidak ada.
+- Pertanyaan/Keputusan dibutuhkan: titik mounting komponen perlu kontrak/arsitektur halaman (mis. `index.html` memakai `.product-grid`).
 
