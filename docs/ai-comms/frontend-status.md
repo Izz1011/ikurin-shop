@@ -1,8 +1,8 @@
 # Status Frontend (ditulis hanya oleh FRONTEND AI — OpenCode)
 
 ## Ringkasan Saat Ini
-- Tugas aktif: FE-004 — Halaman login & register + route guard (`guard.js`)
-- Terakhir selesai: FE-004 — Halaman login & register + route guard — status `IN_PROGRESS`
+- Tugas aktif: FE-005 — Profil + Buka Toko (form, preview, status pengajuan)
+- Terakhir selesai: FE-004 — Halaman login & register + route guard — status `REVIEW`
 - Langkah berikutnya: FE-005
 
 ## Pertanyaan Terbuka
@@ -31,8 +31,8 @@
 - Penyimpangan dari kontrak: tidak ada.
 - Pertanyaan/Keputusan dibutuhkan: titik mounting komponen perlu kontrak/arsitektur halaman (mis. `index.html` memakai `.product-grid`).
 
-### 2026-10-29 19:05 — FE-004 — IN_PROGRESS
-- Ringkasan: Halaman `login.html`, `register.html`, page JS (`pages/login.js`, `pages/register.js`) + `guard.js` (`requireRole`) dibuat — form login/register via `api`, toast error, anti double-submit, redirect setelah sukses.
+### 2026-10-29 19:05 — FE-004 — REVIEW
+- Ringkasan: Halaman `login.html`, `register.html`, page JS (`pages/login.js`, `pages/register.js`) + `guard.js` (`requireRole`) selesai — form login/register via `api`, toast error, anti double-submit, redirect setelah sukses.
 - File diubah: `htdocs/login.html`, `htdocs/register.html`, `htdocs/assets/css/pages/auth.css`, `htdocs/assets/js/pages/login.js`, `htdocs/assets/js/pages/register.js`, `htdocs/assets/js/guard.js` (baru).
 - Cara uji: butuh backend/mock; cek via browser setelah halaman dilengkapi (FE-007).
 - Penyimpangan dari kontrak: tidak ada.
