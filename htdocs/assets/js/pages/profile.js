@@ -1,11 +1,8 @@
 import { api } from '../api.js';
+import { requireAuth } from '../guard.js';
 import { showToast } from '../components/toast.js';
 import { mountNavbar } from '../components/navbar.js';
 import { mountFooter } from '../components/footer.js';
-
-function setText(node, text) {
-  node.textContent = text ?? '';
-}
 
 function renderUser(user) {
   const card = document.getElementById('profile-card');
@@ -44,12 +41,11 @@ function renderApplication(application) {
 }
 
 async function initProfilePage() {
-  try {
-    const { data } = await api.get('/users/me');
-    renderUser(data.user);
-  } catch (error) {
-    showToast(error.message, 'error');
+  const user = await requireAuth();
+  if (!user) {
+    return;
   }
+  renderUser(user);
 
   try {
     const { data: application } = await api.get('/stores/me/application');

@@ -24,6 +24,20 @@ function productById(id) {
   return { ...product, description: 'Mock description.' };
 }
 
+function fieldsFrom(body) {
+  if (body && typeof body.get === 'function') {
+    const fields = {};
+    body.forEach((value, key) => {
+      fields[key] = value;
+    });
+    return fields;
+  }
+  return body || {};
+}
+
+let mockSessionUser = null;
+let mockStoreApplication = null;
+
 export async function mockRequest(path, { method = 'GET', body = null } = {}) {
   await new Promise((resolve) => setTimeout(resolve, latency()));
 
@@ -40,7 +54,7 @@ export async function mockRequest(path, { method = 'GET', body = null } = {}) {
 
   if (method === 'GET' && pathname === '/auth/me') {
     return ok({
-      user: null,
+      user: mockSessionUser,
       csrf_token: 'mock-csrf-token',
       unread_notifications: 0,
       unread_messages: 0,
@@ -66,15 +80,16 @@ export async function mockRequest(path, { method = 'GET', body = null } = {}) {
   if (method === 'POST' && pathname === '/auth/login') {
     const { email, password } = body || {};
     if (email === 'mock@mail.com' && password === 'mock12345') {
+      mockSessionUser = {
+        id: 1,
+        username: 'Mock',
+        email,
+        phone: null,
+        role: 'USER',
+        store_status: null,
+      };
       return ok({
-        user: {
-          id: 1,
-          username: 'Mock',
-          email,
-          phone: null,
-          role: 'USER',
-          store_status: null,
-        },
+        user: mockSessionUser,
         csrf_token: 'mock-csrf-token',
       });
     }
@@ -88,14 +103,40 @@ export async function mockRequest(path, { method = 'GET', body = null } = {}) {
         password: 'Password minimal 8 karakter.',
       });
     }
-    return ok({
+    mockSessionUser = {
       id: mockProducts.length + 2,
       username,
       email,
       phone: null,
       role: 'USER',
       store_status: null,
-    });
+    };
+    return ok({ ...mockSessionUser });
+  }
+
+  const storeApplicationMatch = pathname.match(/^\/stores\/me\/application$/);
+  if (method === 'GET' && storeApplicationMatch) {
+    return ok(mockStoreApplication);
+  }
+
+  if (method === 'POST' && pathname === '/stores') {
+    const fields = fieldsFrom(body);
+    const { store_name, category, description, whatsapp, address, ktp_image, logo_image } = fields;
+    if (!store_name || !category || !address || !ktp_image) {
+      return fail(
+        'VALIDATION_ERROR',
+        'Lengkapi field wajib sebelum mengirim.',
+        422,
+        { store_name: 'Nama toko wajib.', category: 'Kategori wajib.', address: 'Alamat wajib.' }
+      );
+    }
+    mockStoreApplication = {
+      status: 'PENDING',
+      store_name,
+      created_at: '2026-10-29 10:00:00',
+    };
+    mockSessionUser = { ...mockSessionUser, store_status: 'PENDING' };
+    return ok({ id: 2, status: 'PENDING' });
   }
 
   return fail('NOT_FOUND', 'Endpoint mock tidak dikenal.', 404);

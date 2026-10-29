@@ -1,12 +1,21 @@
 import { api } from './api.js';
 
-export async function requireRole(role) {
+export async function requireAuth() {
   const { data } = await api.get('/auth/me');
   const user = data.user;
   const currentPath = window.location.pathname + window.location.search;
 
   if (!user) {
     window.location.href = `/login.html?next=${encodeURIComponent(currentPath)}`;
+    return null;
+  }
+
+  return user;
+}
+
+export async function requireRole(role) {
+  const user = await requireAuth();
+  if (!user) {
     return null;
   }
 
