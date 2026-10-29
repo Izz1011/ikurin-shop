@@ -3,14 +3,19 @@ Options -Indexes
 DirectoryIndex index.html
 
 <IfModule mod_rewrite.c>
-RewriteEngine On
-# Paksa HTTPS di produksi (hapus 3 baris ini untuk lokal tanpa HTTPS)
-RewriteCond %{HTTPS} off
-RewriteCond %{HTTP_HOST} !^localhost
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+  RewriteEngine On
 
-# API front controller
-RewriteRule ^api/v1/(.*)$ api/index.php [L,QSA]
+  # Paksa HTTPS di produksi (kecuali localhost dan 127.0.0.1 untuk development lokal)
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP_HOST} !^localhost [NC]
+  RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Blokir akses langsung via web ke folder internal backend
+  RewriteRule ^(app|config|storage)/ - [F,L,NC]
+
+  # API front controller rewrite (/api/v1 dan /api/v1/* ke api/index.php)
+  RewriteRule ^api/v1(?:/.*)?$ api/index.php [L,QSA]
 </IfModule>
 
 # Blokir file sensitif
@@ -32,7 +37,7 @@ RewriteRule ^api/v1/(.*)$ api/index.php [L,QSA]
   Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://js.pusher.com; connect-src 'self' https://*.pusher.com wss://*.pusher.com; img-src 'self' data:; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-ancestors 'none'"
 </IfModule>
 
-# Kompresi & cache aset
+# Kompresi & cache aset (optimasi kuota hits / CPU InfinityFree)
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
 </IfModule>

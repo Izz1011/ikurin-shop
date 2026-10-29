@@ -1,0 +1,30 @@
+# htdocs/uploads/.htaccess (milik BACKEND) — Upload publik, tanpa eksekusi script
+Options -Indexes -ExecCGI
+
+# Nonaktifkan engine PHP pada mod_php
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+  php_flag engine off
+</IfModule>
+
+# Hapus handler eksekusi script untuk FastCGI / PHP-FPM
+<IfModule mod_mime.c>
+  RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phar .cgi .pl .py .sh
+  RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phar .cgi .pl .py .sh
+</IfModule>
+
+# Blokir seluruh file yang berpotensi script / executable
+<FilesMatch "\.(php|phtml|php\d|phar|pl|py|cgi|sh|inc|asp|aspx|jsp)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
