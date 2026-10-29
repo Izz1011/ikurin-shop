@@ -1,0 +1,22 @@
+# Secrets & env
+.env
+htdocs/config/.env
+*.env.local
+# Runtime data
+htdocs/uploads/*
+!htdocs/uploads/.gitkeep
+htdocs/storage/private/*
+!htdocs/storage/private/.gitkeep
+htdocs/storage/logs/*
+!htdocs/storage/logs/.gitkeep
+# Dependencies / build
+vendor/
+node_modules/
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+*.zip
+*.bak
