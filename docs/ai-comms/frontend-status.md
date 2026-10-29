@@ -3,7 +3,7 @@
 ## Ringkasan Saat Ini
 - Tugas aktif: FE-005 — Profil + Buka Toko (form, preview, status pengajuan)
 - Terakhir selesai: FE-004 — Halaman login & register + route guard — status `REVIEW`
-- Langkah berikutnya: FE-005
+- Langkah berikutnya: FE-006
 
 ## Pertanyaan Terbuka
 (kosong)
