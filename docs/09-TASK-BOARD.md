@@ -16,7 +16,7 @@ Aturan: AI hanya mengubah kolom Status pada baris berprefix miliknya. Ambil tuga
 ## Backend (Antigravity)
 | ID | Tugas | P | Dep | M | Status |
 |---|---|---|---|---|---|
-| BE-001 | Struktur `htdocs/app`, autoload PSR-4, `Env`, `Database` (PDO), `Response`, `Router`, error handler, logger | P0 | – | M0 | TODO |
+| BE-001 | Struktur `htdocs/app`, autoload PSR-4, `Env`, `Database` (PDO), `Response`, `Router`, error handler, logger | P0 | – | M0 | REVIEW |
 | BE-002 | `.htaccess` (rewrite API, blokir folder privat, header keamanan), uploads/.htaccess, `config/.env.example` | P0 | BE-001 | M0 | TODO |
 | BE-003 | Session + CSRF + `GET /auth/csrf`, `/config/public`, `/auth/me` | P0 | BE-001 | M0 | TODO |
 | BE-004 | Register/login/logout, rate limit, timeout sesi, ubah profil/password | P0 | BE-003 | M1 | TODO |
