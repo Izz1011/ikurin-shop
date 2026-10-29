@@ -1,8 +1,8 @@
 # Status Frontend (ditulis hanya oleh FRONTEND AI — OpenCode)
 
 ## Ringkasan Saat Ini
-- Tugas aktif: FE-005 — Profil + Buka Toko (form, preview, status pengajuan)
-- Terakhir selesai: FE-004 — Halaman login & register + route guard — status `REVIEW`
+- Tugas aktif: FE-006 — Admin: login-guard, daftar & detail verifikasi toko
+- Terakhir selesai: FE-005 — Profil + Buka Toko (form, preview, status pengajuan) — status `REVIEW`
 - Langkah berikutnya: FE-006
 
 ## Pertanyaan Terbuka
@@ -37,4 +37,11 @@
 - Cara uji: butuh backend/mock; cek via browser setelah halaman dilengkapi (FE-007).
 - Penyimpangan dari kontrak: tidak ada.
 - Pertanyaan/Keputusan dibutuhkan: redirect setelah login ke `?next=` — validasi path dari klien (TODO(question)).
+
+### 2026-10-29 20:10 — FE-005 — REVIEW
+- Ringkasan: Halaman Profil (`profile.html` + `pages/profile.js`) & Buka Toko (`open-store.html` + `pages/open-store.js`) selesai — form Buka Toko (field wajib, preview gambar KTP/logo via object URL, submit multipart ke `POST /stores`, redirect ke profil) & halaman Profil (akun via `GET /auth/me`, status pengajuan via `GET /stores/me/application`).
+- File diubah: `htdocs/profile.html`, `htdocs/open-store.html`, `htdocs/assets/css/pages/{profile,open-store}.css`, `htdocs/assets/js/pages/{profile,open-store}.js` (baru); `htdocs/assets/js/guard.js` (tambah `requireAuth`).
+- Cara uji: `USE_MOCK=true` — login `mock@mail.com` / `mock12345`, buka tokos via `/open-store.html`, status pengajuan muncul di `/profile.html`.
+- Penyimpangan dari kontrak: tidak ada (fix: user read memakai `GET /auth/me` sesuai kontrak; `PATCH/POST /users/me` hanya untuk update).
+- Pertanyaan/Keputusan dibutuhkan: `POST /stores` mock tidak mensimulasikan 409 nama toko dipakai.
 
