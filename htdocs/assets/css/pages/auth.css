@@ -1,0 +1,26 @@
+.auth {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-6);
+}
+
+.auth__title {
+  margin-bottom: var(--space-2);
+}
+
+.auth__subtitle {
+  margin-bottom: var(--space-6);
+  color: var(--color-text-muted);
+}
+
+.auth__footer {
+  margin-top: var(--space-6);
+  text-align: center;
+  font-size: var(--fs-sm);
+}

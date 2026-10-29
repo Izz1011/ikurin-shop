@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Masuk — Ikurin Shop</title>
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/pages/auth.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <main class="auth">
+    <section class="auth__card card">
+      <h1 class="auth__title">Masuk ke Ikurin Shop</h1>
+      <p class="auth__subtitle">Masuk untuk berbelanja dan berjualan.</p>
+      <form id="login-form" class="form" novalidate>
+        <div class="field">
+          <label class="field__label" for="login-email">Email</label>
+          <input class="field__control" type="email" id="login-email" name="email" placeholder="nama@mail.com" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label class="field__label" for="login-password">Password</label>
+          <input class="field__control" type="password" id="login-password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <p class="field__error" id="login-error" hidden></p>
+        <button class="btn btn--primary" type="submit" id="login-submit">Masuk</button>
+      </form>
+      <p class="auth__footer">Belum punya akun? <a href="/register.html">Daftar</a></p>
+    </section>
+  </main>
+  <div id="footer"></div>
+  <script type="module" src="/assets/js/pages/login.js"></script>
+</body>
+</html>

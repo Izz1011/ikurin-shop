@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daftar — Ikurin Shop</title>
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/pages/auth.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <main class="auth">
+    <section class="auth__card card">
+      <h1 class="auth__title">Buat Akun</h1>
+      <p class="auth__subtitle">Daftar untuk mulai berbelanja atau berjualan.</p>
+      <form id="register-form" class="form" novalidate>
+        <div class="field">
+          <label class="field__label" for="register-username">Nama</label>
+          <input class="field__control" type="text" id="register-username" name="username" placeholder="Siti" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label class="field__label" for="register-email">Email</label>
+          <input class="field__control" type="email" id="register-email" name="email" placeholder="nama@mail.com" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label class="field__label" for="register-password">Password</label>
+          <input class="field__control" type="password" id="register-password" name="password" placeholder="Minimal 8 karakter" autocomplete="new-password" required>
+        </div>
+        <div class="field">
+          <label class="field__label" for="register-phone">No. HP (opsional)</label>
+          <input class="field__control" type="tel" id="register-phone" name="phone" placeholder="08..." autocomplete="tel">
+        </div>
+        <p class="field__error" id="register-error" hidden></p>
+        <button class="btn btn--primary" type="submit" id="register-submit">Daftar</button>
+      </form>
+      <p class="auth__footer">Sudah punya akun? <a href="/login.html">Masuk</a></p>
+    </section>
+  </main>
+  <div id="footer"></div>
+  <script type="module" src="/assets/js/pages/register.js"></script>
+</body>
+</html>
