@@ -19,7 +19,7 @@ Aturan: AI hanya mengubah kolom Status pada baris berprefix miliknya. Ambil tuga
 | BE-001 | Struktur `htdocs/app`, autoload PSR-4, `Env`, `Database` (PDO), `Response`, `Router`, error handler, logger | P0 | – | M0 | REVIEW |
 | BE-002 | `.htaccess` (rewrite API, blokir folder privat, header keamanan), uploads/.htaccess, `config/.env.example` | P0 | BE-001 | M0 | REVIEW |
 | BE-003 | Session + CSRF + `GET /auth/csrf`, `/config/public`, `/auth/me` | P0 | BE-001 | M0 | REVIEW |
-| BE-004 | Register/login/logout, rate limit, timeout sesi, ubah profil/password | P0 | BE-003 | M1 | TODO |
+| BE-004 | Register/login/logout, rate limit, timeout sesi, ubah profil/password | P0 | BE-003 | M1 | REVIEW |
 | BE-005 | Middleware RBAC (Auth, Role, StoreActive) | P0 | BE-004 | M1 | TODO |
 | BE-006 | `ImageUploader` (validasi MIME, GD re-encode, ≤300KB, nama acak, private/public) | P0 | BE-001 | M1 | TODO |
 | BE-007 | Buka toko + status pengajuan | P0 | BE-005,006 | M1 | TODO |

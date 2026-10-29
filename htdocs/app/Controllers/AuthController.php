@@ -35,4 +35,31 @@ class AuthController
         $data = $this->authService->getAuthMeData();
         Response::ok($data);
     }
+
+    /**
+     * POST /api/v1/auth/register
+     */
+    public function register(Request $request): void
+    {
+        $user = $this->authService->register($request->getBody());
+        Response::created($user);
+    }
+
+    /**
+     * POST /api/v1/auth/login
+     */
+    public function login(Request $request): void
+    {
+        $data = $this->authService->login($request->getBody(), $request->getIp());
+        Response::ok($data);
+    }
+
+    /**
+     * POST /api/v1/auth/logout
+     */
+    public function logout(Request $request): void
+    {
+        $this->authService->logout();
+        Response::ok((object) []);
+    }
 }

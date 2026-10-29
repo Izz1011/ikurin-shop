@@ -292,6 +292,216 @@ assertCondition(
 );
 Session::remove('user_id');
 
+// 8. BE-004: Register, Login, Logout, Rate Limit, Profile & Password Update
+use App\Core\Validator;
+
+// Test Validator
+$validatorPassed = false;
+try {
+    Validator::validate([
+        'username' => 'ab',
+        'email' => 'bukan-email',
+        'password' => '123',
+        'phone' => '12345',
+    ], [
+        'username' => 'required|min:3|max:100',
+        'email' => 'required|email',
+        'password' => 'required|min:8',
+        'phone' => 'nullable|phone',
+    ]);
+} catch (AppException $e) {
+    $fields = $e->getFields();
+    if (
+        $e->getErrorCode() === 'VALIDATION_ERROR' &&
+        isset($fields['username']) &&
+        isset($fields['email']) &&
+        isset($fields['password']) &&
+        isset($fields['phone'])
+    ) {
+        $validatorPassed = true;
+    }
+}
+assertCondition($validatorPassed, 'Validator catches invalid fields and returns 422 with fields map');
+
+// Test POST /api/v1/auth/register (Success)
+$regEmail = 'siti.' . time() . '@mail.com';
+$regReq = new Request('POST', '/api/v1/auth/register', null, [
+    'username' => 'Siti Banjar',
+    'email' => $regEmail,
+    'password' => 'password123!',
+    'phone' => '081234567890',
+], ['x-csrf-token' => $csrfToken]);
+
+ob_start();
+$router->dispatch($regReq);
+$regRes = json_decode(ob_get_clean(), true);
+
+assertCondition(
+    isset($regRes['success']) && $regRes['success'] === true &&
+    isset($regRes['data']['id']) &&
+    $regRes['data']['email'] === $regEmail &&
+    $regRes['data']['role'] === 'USER' &&
+    $regRes['data']['store_status'] === null,
+    'POST /api/v1/auth/register creates user and returns 201 User object'
+);
+assertCondition(
+    Session::get('user_id') === $regRes['data']['id'],
+    'POST /api/v1/auth/register automatically logs the new user in'
+);
+
+$newUserId = (int) $regRes['data']['id'];
+
+// Test POST /api/v1/auth/register (Duplicate Email -> 422)
+$dupReq = new Request('POST', '/api/v1/auth/register', null, [
+    'username' => 'Siti Lain',
+    'email' => $regEmail,
+    'password' => 'password123!',
+], ['x-csrf-token' => $csrfToken]);
+
+$dupCaught = false;
+try {
+    $router->dispatch($dupReq);
+} catch (AppException $e) {
+    if ($e->getErrorCode() === 'VALIDATION_ERROR' && isset($e->getFields()['email'])) {
+        $dupCaught = true;
+    }
+}
+assertCondition($dupCaught, 'POST /api/v1/auth/register rejects duplicate email with 422');
+
+// Test POST /api/v1/auth/logout
+$logoutReq = new Request('POST', '/api/v1/auth/logout', null, [], ['x-csrf-token' => $csrfToken]);
+ob_start();
+$router->dispatch($logoutReq);
+$logoutRes = json_decode(ob_get_clean(), true);
+assertCondition(
+    isset($logoutRes['success']) && $logoutRes['success'] === true &&
+    Session::get('user_id') === null,
+    'POST /api/v1/auth/logout terminates user session'
+);
+
+// After logout, client fetches a new CSRF token for the new guest session
+$csrfToken = Csrf::getToken();
+
+// Test POST /api/v1/auth/login (Invalid credentials -> 401)
+$wrongLoginReq = new Request('POST', '/api/v1/auth/login', null, [
+    'email' => $regEmail,
+    'password' => 'wrong_password',
+], ['x-csrf-token' => $csrfToken]);
+
+$invalidCaught = false;
+try {
+    $router->dispatch($wrongLoginReq);
+} catch (AppException $e) {
+    if ($e->getErrorCode() === 'INVALID_CREDENTIALS' && $e->getHttpStatus() === 401) {
+        $invalidCaught = true;
+    }
+}
+assertCondition($invalidCaught, 'POST /api/v1/auth/login rejects wrong password with 401 INVALID_CREDENTIALS');
+
+// Test Rate Limiting on Login (5 failed attempts trigger 429)
+for ($i = 0; $i < 4; $i++) {
+    try {
+        $router->dispatch($wrongLoginReq);
+    } catch (AppException $e) {
+        // expect 401
+    }
+}
+$rateLimitCaught = false;
+try {
+    $router->dispatch($wrongLoginReq);
+} catch (AppException $e) {
+    if ($e->getErrorCode() === 'RATE_LIMITED' && $e->getHttpStatus() === 429) {
+        $rateLimitCaught = true;
+    }
+}
+assertCondition($rateLimitCaught, 'POST /api/v1/auth/login triggers 429 RATE_LIMITED after 5 failed attempts');
+
+// Clear login attempts for testing so we can log in cleanly
+$attemptRepo = new \App\Repositories\LoginAttemptRepository();
+$attemptRepo->clear($regEmail, $wrongLoginReq->getIp());
+
+// Test POST /api/v1/auth/login (Valid credentials -> 200)
+$validLoginReq = new Request('POST', '/api/v1/auth/login', null, [
+    'email' => $regEmail,
+    'password' => 'password123!',
+], ['x-csrf-token' => $csrfToken]);
+
+ob_start();
+$router->dispatch($validLoginReq);
+$loginRes = json_decode(ob_get_clean(), true);
+
+assertCondition(
+    isset($loginRes['success']) && $loginRes['success'] === true &&
+    isset($loginRes['data']['user']['id']) && $loginRes['data']['user']['id'] === $newUserId &&
+    !empty($loginRes['data']['csrf_token']),
+    'POST /api/v1/auth/login succeeds with correct password, returns user and csrf_token'
+);
+
+// Test PATCH /api/v1/users/me (Update profile)
+$updateProfReq = new Request('PATCH', '/api/v1/users/me', null, [
+    'username' => 'Siti Updated',
+    'phone' => '089876543210',
+], ['x-csrf-token' => $csrfToken]);
+
+ob_start();
+$router->dispatch($updateProfReq);
+$updateProfRes = json_decode(ob_get_clean(), true);
+
+assertCondition(
+    isset($updateProfRes['success']) && $updateProfRes['success'] === true &&
+    $updateProfRes['data']['username'] === 'Siti Updated' &&
+    $updateProfRes['data']['phone'] === '089876543210',
+    'PATCH /api/v1/users/me updates username and phone'
+);
+
+// Test POST /api/v1/users/me/password (Wrong current password -> 422)
+$wrongPassReq = new Request('POST', '/api/v1/users/me/password', null, [
+    'current_password' => 'wrong_pass',
+    'new_password' => 'newpassword123!',
+], ['x-csrf-token' => $csrfToken]);
+
+$passMismatchCaught = false;
+try {
+    $router->dispatch($wrongPassReq);
+} catch (AppException $e) {
+    if ($e->getErrorCode() === 'VALIDATION_ERROR' && isset($e->getFields()['current_password'])) {
+        $passMismatchCaught = true;
+    }
+}
+assertCondition($passMismatchCaught, 'POST /api/v1/users/me/password rejects wrong current password with 422');
+
+// Test POST /api/v1/users/me/password (Success)
+$validPassReq = new Request('POST', '/api/v1/users/me/password', null, [
+    'current_password' => 'password123!',
+    'new_password' => 'newpassword123!',
+], ['x-csrf-token' => $csrfToken]);
+
+ob_start();
+$router->dispatch($validPassReq);
+$validPassRes = json_decode(ob_get_clean(), true);
+assertCondition(
+    isset($validPassRes['success']) && $validPassRes['success'] === true,
+    'POST /api/v1/users/me/password changes password successfully'
+);
+
+// Verify logging in with the new password
+Session::destroy();
+$csrfToken = Csrf::getToken();
+$loginNewPassReq = new Request('POST', '/api/v1/auth/login', null, [
+    'email' => $regEmail,
+    'password' => 'newpassword123!',
+], ['x-csrf-token' => $csrfToken]);
+
+ob_start();
+$router->dispatch($loginNewPassReq);
+$loginNewPassRes = json_decode(ob_get_clean(), true);
+assertCondition(
+    isset($loginNewPassRes['success']) && $loginNewPassRes['success'] === true &&
+    $loginNewPassRes['data']['user']['id'] === $newUserId,
+    'POST /api/v1/auth/login works with newly updated password'
+);
+Session::destroy();
+
 echo "\nSummary: {$passed} passed, {$failed} failed.\n";
 
 if ($failed > 0) {

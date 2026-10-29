@@ -1,9 +1,9 @@
 # Status Backend (ditulis hanya oleh BACKEND AI — Antigravity)
 
 ## Ringkasan Saat Ini
-- Tugas aktif: BE-003 (Selesai, status REVIEW — AKHIR MILESTONE M0)
-- Terakhir selesai: BE-003
-- Langkah berikutnya: Review manusia untuk Milestone M0 (merge feature/be-foundation ke develop), lalu lanjut ke Milestone M1 (BE-004 Register/Login/Logout)
+- Tugas aktif: BE-004 (Selesai, status REVIEW)
+- Terakhir selesai: BE-004
+- Langkah berikutnya: BE-005 (Middleware RBAC: Auth, Role, StoreActive)
 
 ## Pertanyaan Terbuka
 (kosong)
@@ -77,4 +77,32 @@
      - `curl -s http://localhost:8000/api/v1/auth/me` -> HTTP 200 `{"success":true,"data":{"user":null,"csrf_token":"...","unread_notifications":0,"unread_messages":0}}`
      - `curl -s -X POST http://localhost:8000/api/v1/cart/items` -> HTTP 403 `{"success":false,"error":{"code":"CSRF_INVALID","message":"Token CSRF tidak valid atau telah kedaluwarsa."}}`
 - Penyimpangan dari kontrak: tidak ada.
-- Pertanyaan/Keputusan dibutuhkan: tidak ada. Siap untuk review & merge Milestone M0.
+- Pertanyaan/Keputusan dibutuhkan: tidak ada.
+
+### 2026-10-29 19:07 — BE-004 — REVIEW
+- Ringkasan: Mengimplementasikan modul validasi input terpusat (Validator: required, email, min, max, int, in, regex, phone format Indonesia) serta fitur autentikasi & profil akun lengkap:
+  1. `POST /api/v1/auth/register`: registrasi user baru, hash bcrypt, auto-login dengan session baru, respons 201 User object, validasi email duplikat 422.
+  2. `POST /api/v1/auth/login`: autentikasi bcrypt, rate limit berbasis tabel login_attempts (maks 5 percobaan gagal dalam 15 menit -> 429 RATE_LIMITED), regenerasi session ID, kembalikan data user + csrf_token.
+  3. `POST /api/v1/auth/logout`: pembersihan sesi aman.
+  4. `PATCH /api/v1/users/me`: pembaruan username dan phone profil user aktif.
+  5. `POST /api/v1/users/me/password`: pergantian kata sandi dengan verifikasi kata sandi lama & hash bcrypt baru.
+- File diubah:
+  - `htdocs/app/Core/Validator.php`
+  - `htdocs/app/Repositories/UserRepository.php`
+  - `htdocs/app/Repositories/LoginAttemptRepository.php`
+  - `htdocs/app/Services/AuthService.php`
+  - `htdocs/app/Controllers/AuthController.php`
+  - `htdocs/app/Controllers/UserController.php`
+  - `htdocs/app/routes.php`
+  - `tests/backend/run.php`
+  - `docs/09-TASK-BOARD.md`
+  - `docs/ai-comms/backend-status.md`
+- Cara uji:
+  1. Jalankan `php tests/backend/run.php` -> 57 passed, 0 failed.
+  2. Contoh curl:
+     - `curl -s -X POST http://localhost:8000/api/v1/auth/register -H "Content-Type: application/json" -H "X-CSRF-Token: <token>" -d '{"username":"Siti","email":"siti@mail.com","password":"password123","phone":"08123456789"}'` -> HTTP 201 `{"success":true,"data":{"id":2,"username":"Siti",...}}`
+     - `curl -s -X POST http://localhost:8000/api/v1/auth/login -H "Content-Type: application/json" -H "X-CSRF-Token: <token>" -d '{"email":"siti@mail.com","password":"password123"}'` -> HTTP 200 `{"success":true,"data":{"user":{...},"csrf_token":"..."}}`
+     - `curl -s -X POST http://localhost:8000/api/v1/auth/logout -H "X-CSRF-Token: <token>"` -> HTTP 200 `{"success":true,"data":{}}`
+     - `curl -s -X PATCH http://localhost:8000/api/v1/users/me -H "Content-Type: application/json" -H "X-CSRF-Token: <token>" -d '{"username":"Siti Baru"}'` -> HTTP 200
+- Penyimpangan dari kontrak: tidak ada.
+- Pertanyaan/Keputusan dibutuhkan: tidak ada.
