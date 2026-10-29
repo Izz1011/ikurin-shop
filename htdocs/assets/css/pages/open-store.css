@@ -1,0 +1,15 @@
+.open-store {
+  padding: var(--space-6) var(--space-4);
+}
+
+.open-store__title {
+  margin-bottom: var(--space-4);
+}
+
+.open-store__form {
+  padding: var(--space-6);
+}
+
+.open-store__preview {
+  margin-top: var(--space-2);
+}

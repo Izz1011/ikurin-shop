@@ -1,0 +1,17 @@
+.profile {
+  padding: var(--space-6) var(--space-4);
+}
+
+.profile__title {
+  margin-bottom: var(--space-4);
+}
+
+.profile__card,
+.profile .card {
+  padding: var(--space-6);
+}
+
+.profile__subtitle {
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-4);
+}

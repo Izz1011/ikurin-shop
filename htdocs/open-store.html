@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buka Toko — Ikurin Shop</title>
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/pages/open-store.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <main class="open-store">
+    <h1 class="open-store__title">Buka Toko</h1>
+    <section class="card open-store__form">
+      <form id="open-store-form" class="form" novalidate>
+        <div class="field">
+          <label class="field__label" for="store_name">Nama Toko</label>
+          <input class="field__control" type="text" id="store_name" name="store_name" placeholder="Roti Ibu Ani" autocomplete="off" required>
+        </div>
+        <div class="field">
+          <label class="field__label" for="store_category">Kategori</label>
+          <select class="field__control" id="store_category" name="category" required>
+            <option value="">Pilih kategori</option>
+            <option value="bakery">Bakery</option>
+            <option value="snack">Snack</option>
+            <option value="makanan_berat">Makanan Berat</option>
+            <option value="minuman">Minuman</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field__label" for="store_description">Deskripsi</label>
+          <textarea class="field__control" id="store_description" name="description" rows="3" placeholder="Cerita toko..."></textarea>
+        </div>
+        <div class="field">
+          <label class="field__label" for="store_whatsapp">WhatsApp</label>
+          <input class="field__control" type="tel" id="store_whatsapp" name="whatsapp" placeholder="62812..." autocomplete="tel">
+        </div>
+        <div class="field">
+          <label class="field__label" for="store_address">Alamat</label>
+          <textarea class="field__control" id="store_address" name="address" rows="2" placeholder="Kec. Banjarnegara" required></textarea>
+        </div>
+        <div class="field">
+          <label class="field__label" for="store_ktp">Upload KTP (wajib, JPG/PNG ≤2MB)</label>
+          <input class="field__control" type="file" id="store_ktp" name="ktp_image" accept="image/jpeg,image/png" required>
+          <div class="open-store__preview" id="store_ktp-preview"></div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="store_logo">Upload Logo (opsional, JPG/PNG ≤2MB)</label>
+          <input class="field__control" type="file" id="store_logo" name="logo_image" accept="image/jpeg,image/png">
+          <div class="open-store__preview" id="store_logo-preview"></div>
+        </div>
+        <button class="btn btn--primary" type="submit" id="open-store-submit">Kirim Pengajuan</button>
+      </form>
+    </section>
+  </main>
+  <div id="footer"></div>
+  <script type="module" src="/assets/js/pages/open-store.js"></script>
+</body>
+</html>
