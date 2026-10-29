@@ -2,7 +2,7 @@
 
 ## Ringkasan Saat Ini
 - Tugas aktif: FE-003 — Komponen: navbar, bottom-nav mobile, footer, product card, pagination, format Rupiah
-- Terakhir selesai: FE-002 — API client + mock API (CSRF, envelope, error handling) — status `IN_PROGRESS`
+- Terakhir selesai: FE-002 — API client + mock API (CSRF, envelope, error handling) — status `REVIEW`
 - Langkah berikutnya: FE-003
 
 ## Pertanyaan Terbuka
@@ -17,7 +17,7 @@
 - Penyimpangan dari kontrak: tidak ada (FE-001 murni presentasi/tokens).
 - Pertanyaan/Keputusan dibutuhkan: konfirmasi warna badge/priority & nama kelas komponen sebelum FE-003.
 
-### 2026-10-29 18:47 — FE-002 — IN_PROGRESS
+### 2026-10-29 18:47 — FE-002 — REVIEW
 - Ringkasan: API client (`assets/js/api.js`) + mock handler/fixtures (`assets/js/mock/`) + `assets/js/config.js` dibuat — `api.get/post/patch/del/upload`, envelope parsing, `ApiError{code,message,fields,status}`, CSRF token via `/auth/csrf`, 401 → redirect login.
 - File diubah: `htdocs/assets/js/config.js`, `htdocs/assets/js/api.js`, `htdocs/assets/js/mock/handler.js`, `htdocs/assets/js/mock/fixtures.js` (baru).
 - Cara uji: modul api dengan `USE_MOCK=true` — endpoint `/config/public`, `/auth/csrf`, `/auth/me`, `/products`, `/products/{id}`, `/auth/login`, `/auth/register`.
