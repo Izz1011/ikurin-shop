@@ -43,7 +43,7 @@ Aturan: AI hanya mengubah kolom Status pada baris berprefix miliknya. Ambil tuga
 ## Frontend (OpenCode)
 | ID | Tugas | P | Dep | M | Status |
 |---|---|---|---|---|---|
-| FE-001 | Design system CSS (variabel, tipografi, tombol, form, card, grid, toast, modal, skeleton) | P0 | – | M0 | TODO |
+| FE-001 | Design system CSS (variabel, tipografi, tombol, form, card, grid, toast, modal, skeleton) | P0 | – | M0 | REVIEW |
 | FE-002 | `api.js` (CSRF, envelope, error handling) + adaptor mock + fixture sesuai kontrak | P0 | – | M0 | TODO |
 | FE-003 | Komponen: navbar, bottom-nav mobile, footer, product card, pagination, format Rupiah | P0 | FE-001 | M0 | TODO |
 | FE-004 | Halaman login & register + route guard (`guard.js`) | P0 | FE-002 | M1 | TODO |
