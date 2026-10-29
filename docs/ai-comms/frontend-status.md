@@ -2,8 +2,8 @@
 
 ## Ringkasan Saat Ini
 - Tugas aktif: FE-004 — Halaman login & register + route guard (`guard.js`)
-- Terakhir selesai: FE-003 — Komponen UI reusable (navbar, bottom-nav, footer, product card, pagination, toast, modal) + `format.js` (Rupiah & tanggal Indonesia) — status `REVIEW`
-- Langkah berikutnya: FE-004
+- Terakhir selesai: FE-004 — Halaman login & register + route guard — status `IN_PROGRESS`
+- Langkah berikutnya: FE-005
 
 ## Pertanyaan Terbuka
 (kosong)
@@ -30,4 +30,11 @@
 - Cara uji: butuh halaman HTML pembungkus komponen; cek via halaman setelah FE-007.
 - Penyimpangan dari kontrak: tidak ada.
 - Pertanyaan/Keputusan dibutuhkan: titik mounting komponen perlu kontrak/arsitektur halaman (mis. `index.html` memakai `.product-grid`).
+
+### 2026-10-29 19:05 — FE-004 — IN_PROGRESS
+- Ringkasan: Halaman `login.html`, `register.html`, page JS (`pages/login.js`, `pages/register.js`) + `guard.js` (`requireRole`) dibuat — form login/register via `api`, toast error, anti double-submit, redirect setelah sukses.
+- File diubah: `htdocs/login.html`, `htdocs/register.html`, `htdocs/assets/css/pages/auth.css`, `htdocs/assets/js/pages/login.js`, `htdocs/assets/js/pages/register.js`, `htdocs/assets/js/guard.js` (baru).
+- Cara uji: butuh backend/mock; cek via browser setelah halaman dilengkapi (FE-007).
+- Penyimpangan dari kontrak: tidak ada.
+- Pertanyaan/Keputusan dibutuhkan: redirect setelah login ke `?next=` — validasi path dari klien (TODO(question)).
 
