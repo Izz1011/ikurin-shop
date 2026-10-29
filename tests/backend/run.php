@@ -64,6 +64,12 @@ assertCondition(Env::get('NULL_VAL') === null, 'Env::get casts null');
 assertCondition(Env::get('FALSE_VAL') === false, 'Env::get casts boolean false');
 assertCondition(Env::get('NON_EXISTENT', 'default_val') === 'default_val', 'Env::get fallback default');
 
+// Reload actual config/.env for subsequent database and integration tests
+$actualEnvPath = dirname(__DIR__, 2) . '/htdocs/config/.env';
+if (file_exists($actualEnvPath)) {
+    Env::load($actualEnvPath);
+}
+
 // 3. Response Envelope Test
 ob_start();
 Response::ok(['id' => 1, 'name' => 'Produk A'], ['page' => 1, 'total' => 10]);
@@ -176,6 +182,115 @@ $envExample = file_get_contents(dirname(__DIR__, 2) . '/htdocs/config/.env.examp
 assertCondition(str_contains((string) $envExample, 'DB_NAME='), 'config/.env.example contains DB_NAME');
 assertCondition(str_contains((string) $envExample, 'PUSHER_KEY='), 'config/.env.example contains PUSHER_KEY');
 assertCondition(str_contains((string) $envExample, 'SESSION_NAME='), 'config/.env.example contains SESSION_NAME');
+
+// 7. BE-003: Session, CSRF, and Auth/Config Endpoints
+use App\Core\Session;
+use App\Core\Csrf;
+use App\Middleware\CsrfMiddleware;
+use App\Controllers\ConfigController;
+use App\Controllers\AuthController;
+
+// Session test
+Session::start();
+Session::set('test_key', 'test_value');
+assertCondition(Session::get('test_key') === 'test_value', 'Session stores and retrieves data');
+Session::remove('test_key');
+assertCondition(Session::get('test_key') === null, 'Session removes key');
+
+// CSRF test
+$csrfToken = Csrf::getToken();
+assertCondition(!empty($csrfToken) && strlen($csrfToken) === 64, 'Csrf::getToken produces 64-char hex token');
+assertCondition(Csrf::validate($csrfToken) === true, 'Csrf::validate accepts valid token');
+assertCondition(Csrf::validate('invalid_token') === false, 'Csrf::validate rejects invalid token');
+assertCondition(Csrf::validate('') === false, 'Csrf::validate rejects empty token');
+
+// CsrfMiddleware test
+$csrfMiddleware = new CsrfMiddleware();
+$middlewareCalled = false;
+$nextClosure = function ($req) use (&$middlewareCalled) {
+    $middlewareCalled = true;
+};
+
+// GET request should pass without CSRF token
+$getReq = new Request('GET', '/api/v1/auth/csrf');
+$csrfMiddleware->handle($getReq, $nextClosure);
+assertCondition($middlewareCalled === true, 'CsrfMiddleware allows GET request without CSRF token');
+
+// POST request without token should throw 403
+$middlewareCalled = false;
+$postReqNoCsrf = new Request('POST', '/api/v1/cart/items');
+$csrfBlocked = false;
+try {
+    $csrfMiddleware->handle($postReqNoCsrf, $nextClosure);
+} catch (AppException $e) {
+    if ($e->getErrorCode() === 'CSRF_INVALID' && $e->getHttpStatus() === 403) {
+        $csrfBlocked = true;
+    }
+}
+assertCondition($csrfBlocked === true, 'CsrfMiddleware rejects POST without CSRF token with 403 CSRF_INVALID');
+
+// POST request with valid token should pass
+$middlewareCalled = false;
+$postReqValidCsrf = new Request('POST', '/api/v1/cart/items', null, null, ['x-csrf-token' => $csrfToken]);
+$csrfMiddleware->handle($postReqValidCsrf, $nextClosure);
+assertCondition($middlewareCalled === true, 'CsrfMiddleware allows POST with valid X-CSRF-Token');
+
+// API Dispatch Test: GET /api/v1/config/public
+$router = new Router();
+require dirname(__DIR__, 2) . '/htdocs/app/routes.php';
+
+$reqConfig = new Request('GET', '/api/v1/config/public');
+ob_start();
+$router->dispatch($reqConfig);
+$resConfig = json_decode(ob_get_clean(), true);
+assertCondition(
+    isset($resConfig['success']) && $resConfig['success'] === true &&
+    isset($resConfig['data']['site_name']) &&
+    isset($resConfig['data']['service_fee_percent']) &&
+    isset($resConfig['data']['categories']) && is_array($resConfig['data']['categories']),
+    'GET /api/v1/config/public returns valid config according to contract'
+);
+
+// API Dispatch Test: GET /api/v1/auth/csrf
+$reqCsrf = new Request('GET', '/api/v1/auth/csrf');
+ob_start();
+$router->dispatch($reqCsrf);
+$resCsrf = json_decode(ob_get_clean(), true);
+assertCondition(
+    isset($resCsrf['success']) && $resCsrf['success'] === true &&
+    !empty($resCsrf['data']['csrf_token']),
+    'GET /api/v1/auth/csrf returns csrf_token according to contract'
+);
+
+// API Dispatch Test: GET /api/v1/auth/me (as guest)
+Session::remove('user_id');
+$reqMeGuest = new Request('GET', '/api/v1/auth/me');
+ob_start();
+$router->dispatch($reqMeGuest);
+$resMeGuest = json_decode(ob_get_clean(), true);
+assertCondition(
+    isset($resMeGuest['success']) && $resMeGuest['success'] === true &&
+    $resMeGuest['data']['user'] === null &&
+    !empty($resMeGuest['data']['csrf_token']) &&
+    $resMeGuest['data']['unread_notifications'] === 0 &&
+    $resMeGuest['data']['unread_messages'] === 0,
+    'GET /api/v1/auth/me returns guest payload with csrf_token and 0 counters'
+);
+
+// API Dispatch Test: GET /api/v1/auth/me (authenticated as admin id=1)
+Session::set('user_id', 1);
+$reqMeAuth = new Request('GET', '/api/v1/auth/me');
+ob_start();
+$router->dispatch($reqMeAuth);
+$resMeAuth = json_decode(ob_get_clean(), true);
+assertCondition(
+    isset($resMeAuth['success']) && $resMeAuth['success'] === true &&
+    isset($resMeAuth['data']['user']['id']) && $resMeAuth['data']['user']['id'] === 1 &&
+    $resMeAuth['data']['user']['role'] === 'ADMIN' &&
+    array_key_exists('store_status', $resMeAuth['data']['user']),
+    'GET /api/v1/auth/me returns authenticated User object matching contract'
+);
+Session::remove('user_id');
 
 echo "\nSummary: {$passed} passed, {$failed} failed.\n";
 
